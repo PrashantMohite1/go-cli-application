@@ -8,9 +8,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "mycli",
+	Use:   "cli application to take backup of postgres , oracle db , mysql",
 	Short: "My CLI Application",
-	Long:  `My CLI Application is a simple demonstration of Cobra in Go.`,
+	Long:  `A cli application to take backup of postgres , oracle db , mysql and more things will added in future.`,
 }
 
 func Execute() {

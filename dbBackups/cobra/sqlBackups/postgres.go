@@ -2,10 +2,14 @@ package sqlBackups
 
 import (
 	"fmt"
-
+	"log"
 	"os/exec"
 
+	"os"
+
 	"github.com/spf13/cobra"
+
+	"github.com/joho/godotenv"
 )
 
 var helloCmd = &cobra.Command{
@@ -14,12 +18,11 @@ var helloCmd = &cobra.Command{
 	Long:  `to use this option you need to mention .env file which contains all the postgres db related credentials`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		add := addition(13, 13)
-		fmt.Println("addition of 13 and 13 ", add)
-		fmt.Println("Hello from my CLI app!")
 
-		fmt.Println("we are running bash command")
+		fmt.Println("Taking Postgre Backup ...")
+
 		runoscommands()
+
 	},
 }
 
@@ -28,15 +31,30 @@ func init() {
 }
 
 func runoscommands() {
-	out, err := exec.Command("ls /home/prashant/go-projects/./cmd/").Output()
 
-	// fmt.Println("the output = ", out)
+	err := godotenv.Load("./sqlBackups/postgres-backups-scripts/.env")
+	if err != nil {
+		log.Fatalf("Error loading environment variables file")
+	}
+
+	// env := os.Getenv("DB_ENV")
+	hostname := os.Getenv("DB_HOSTNAME")
+	username := os.Getenv("DB_USERNAME")
+	dbpassword := os.Getenv("DB_PASSWORD")
+	dbbackup := os.Getenv("DB_BACKUP")
+	backupDir := os.Getenv("DB_BACKUP_DIR")
+
+	os.Setenv("PGPASSWORD", dbpassword)
+	fmt.Println("hostname = ", hostname)
+	fmt.Println("username =", username)
+
+	out, err := exec.Command("pg_dump", "-h", hostname, "-U", username, "-d", dbbackup, "-F", "c", "-f", backupDir).Output()
 
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
 
-	output := string(out[:])
+	output := string(out)
 	fmt.Println(output)
 
 }
